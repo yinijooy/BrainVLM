@@ -265,17 +265,17 @@ class UMBRELLATrainingPipeline:
         model = create_llava_model_with_custom_patch_embed(self.config)
 
 
-        # Add special tokens if needed 
-        # 필요한 특수 토큰 목록
+        # Add special tokens if needed
+        # List of required special tokens
         tokens_to_add = ['<|im_start|>', '<|im_end|>', '<image>']
         missing_tokens = [t for t in tokens_to_add if t not in tokenizer.get_vocab()]
 
-        # 없는 토큰만 추가
+        # Add only missing tokens
         if missing_tokens:
             print(f"Adding missing tokens: {missing_tokens}")
             tokenizer.add_special_tokens({'additional_special_tokens': missing_tokens})
             
-            # [중요] 토큰을 새로 추가했을 때만 임베딩 크기를 조절해야 함
+            # [Important] Only resize embeddings when new tokens are added
             model.resize_token_embeddings(len(tokenizer))
         else:
             print("All special tokens already exist. Skipping add_special_tokens.")

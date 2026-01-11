@@ -55,7 +55,7 @@ from monai.transforms import (
     Resize,
     NormalizeIntensity,
     RandAxisFlip,
-    EnsureChannelFirst, # AddChannel 대신 최신 버전 호환성을 위해 사용 (채널이 없을 경우 추가)
+    EnsureChannelFirst,  # Use instead of AddChannel for compatibility (adds channel if missing)
     ToTensor
 )
 
@@ -133,16 +133,16 @@ class UMBRELLADataset(Dataset):
         self.max_images_per_sample = max_images_per_sample
         self.modality_type = modality_type
 
-        # reader=None으로 설정하면 MONAI가 파일 형식(nii.gz 등)에 맞춰 자동으로 reader를 선택합니다.
+        # Setting reader=None lets MONAI auto-select reader based on file format (nii.gz, etc.)
         self.image_loader = LoadImage(reader=None, image_only=True, dtype=np.float32)
 
-        # [수정] Transform 파이프라인 정의
+        # [Modified] Define Transform pipeline
         self.image_transform = self._define_image_augmentation(mode, img_size)
 
         # Load dataset
         self.samples = self._load_dataset()
 
-        # 4D 데이터 여부 체크 (img_size 튜플 길이에 따라)
+        # Check if 4D data (based on img_size tuple length)
         self.is_4d = (len(img_size) == 4)
 
         logger.info(f"Loaded {len(self.samples)} samples from {data_path}")
@@ -179,17 +179,17 @@ class UMBRELLADataset(Dataset):
                     has_images=any(c.get('type') == 'image' for c in turn['content']) if isinstance(turn['content'], list) else False,
                     num_images=sum(1 for c in turn['content'] if c.get('type') == 'image') if isinstance(turn['content'], list) else 0
                 )
-                for turn in item.get('conversations', []) # 'conversations' 키 사용 확인
+                for turn in item.get('conversations', [])  # Use 'conversations' key
             ]
 
             # --- Extract image paths from 'images' key ---
-            # Note: 통합 JSONL 생성기(generate_conversations.py)에서 이미 modality별로
-            # 올바른 이미지와 프롬프트가 생성되므로, 여기서는 단순히 모든 이미지를 로드합니다.
+            # Note: The unified JSONL generator (generate_conversations.py) already creates
+            # correct images and prompts per modality, so we simply load all images here.
             brain_scans = []
             if 'images' in item:
                 brain_scans = [img['path'] for img in item['images'] if 'path' in img]
             elif 'brain_scans' in item:
-                # 하위 호환성
+                # Backwards compatibility
                 brain_scans = item['brain_scans']
             # ---------------------------------------------------
 
@@ -198,7 +198,7 @@ class UMBRELLADataset(Dataset):
                 brain_scans=brain_scans,
                 task_type=item.get('task_type', 'vqa'),
                 task_id=item.get('task_id', ''),
-                modality="multi_scan" if len(brain_scans) > 1 else "single_scan" if brain_scans else "text", # modality 자동 추론 추천
+                modality="multi_scan" if len(brain_scans) > 1 else "single_scan" if brain_scans else "text",  # Auto-infer modality
                 metadata=item.get('metadata')
             )
 
@@ -256,23 +256,23 @@ class UMBRELLADataset(Dataset):
         """
         transforms = []
         
-        # 1. 채널 차원 추가 (H, W, D) -> (C, H, W, D)
-        # channel_dim='no_channel'은 입력 데이터에 채널 차원이 아예 없을 때(3D volume 등) 
-        # 맨 앞에 채널 차원(1)을 추가해줍니다. (구 AddChannel 대체)
+        # 1. Add channel dimension (H, W, D) -> (C, H, W, D)
+        # channel_dim='no_channel' adds channel dim at front when input has no channel (3D volume, etc.)
+        # Replaces deprecated AddChannel
         transforms.append(EnsureChannelFirst(channel_dim='no_channel'))
 
-        # 2. 리사이징 (이미지 크기 맞춤)
-        # spatial_size는 채널을 제외한 공간 차원 크기여야 합니다.
+        # 2. Resizing (match image size)
+        # spatial_size should be spatial dimensions excluding channel
         transforms.append(Resize(spatial_size=img_size))
 
         if mode == 'train':
-            # 3. [Train Only] 데이터 증강: 랜덤 축 뒤집기
+            # 3. [Train Only] Data augmentation: Random axis flip
             transforms.append(RandAxisFlip(prob=0.5))
 
-        # 4. 강도 정규화 (Normalize Intensity)
+        # 4. Intensity normalization
         transforms.append(NormalizeIntensity())
         
-        # 5. Tensor 변환 (MONAI 0.9+ 에서는 선택 사항이나 명시적으로 추가 가능)
+        # 5. Tensor conversion (optional in MONAI 0.9+, but explicit here)
         transforms.append(ToTensor())
 
         return Compose(transforms)
@@ -289,21 +289,21 @@ class UMBRELLADataset(Dataset):
         """
         scans = []
 
-        # 최대 허용 개수만큼만 로드
+        # Load only up to max allowed count
         target_paths = scan_paths[:self.max_images_per_sample]
 
         for scan_path in target_paths:
             try:
-                # 1. MONAI LoadImage로 로드 (Numpy array 반환)
+                # 1. Load with MONAI LoadImage (returns Numpy array)
                 data = self.image_loader(scan_path)
 
-                # 2. Transform 파이프라인 적용
-                # Compose된 transform은 호출 가능(callable) 객체입니다.
+                # 2. Apply Transform pipeline
+                # Composed transform is a callable object
                 if self.image_transform:
                     data = self.image_transform(data)
                 
                 # data shape expected: (C, H, W, D)
-                # 만약 transform 결과가 Tensor가 아니라면 변환
+                # Convert to Tensor if transform result is not Tensor
                 if not isinstance(data, torch.Tensor):
                     data = torch.tensor(data)
 
@@ -311,16 +311,16 @@ class UMBRELLADataset(Dataset):
 
             except Exception as e:
                 logger.warning(f"Failed to load brain scan {scan_path}: {e}")
-                # 로드 실패 시 0으로 채워진 텐서 추가 (Shape 유지: C, H, W, D)
-                # EnsureChannelFirst가 적용된 상태를 가정하여 (1, *img_size)
+                # On load failure, add zero-filled tensor (maintain shape: C, H, W, D)
+                # Assuming EnsureChannelFirst was applied: (1, *img_size)
                 fallback_shape = (1, *self.img_size) 
                 scans.append(torch.zeros(fallback_shape))
 
         if not scans:
-            # 스캔 경로가 비어있거나 모두 실패한 경우
+            # If scan paths are empty or all failed
             return torch.zeros((1, 1, *self.img_size))
 
-        # 3. 스택 (Stacking)
+        # 3. Stacking
         # List[ (C,H,W,D) ] -> Tensor (N, C, H, W, D)
         return torch.stack(scans, dim=0)
 
@@ -372,7 +372,7 @@ class UMBRELLADataset(Dataset):
                     item_type = item.get('type', 'text')
                     if item_type == 'text':
                         text_parts.append(item.get('text', ''))
-                    # [수정] 'type': 'image'일 때는 아무것도 추가하지 않음 (나중에 따로 앞에서 추가함)
+                    # [Modified] Don't add anything for 'type': 'image' (added separately in front later)
             return ''.join(text_parts)
 
         else:
@@ -408,26 +408,26 @@ class UMBRELLADataset(Dataset):
 
         # Process each turn
         for i, turn in enumerate(sample.conversation):
-            # [1] Eval 모드 & 마지막 Assistant 턴이면 건너뛰기 (정답 유출 방지 & 중복 Trigger 방지)
+            # [1] Skip if Eval mode & last Assistant turn (prevent answer leakage & duplicate trigger)
             if self.mode == 'eval':
                 is_last_turn = (i == len(sample.conversation) - 1)
                 is_assistant = (turn.role == 'assistant')
                 if is_last_turn and is_assistant:
                     continue
             
-            # [중요] 턴 시작 지점 기록 (이 부분이 누락되었습니다)
+            # [Important] Record turn start position (this was missing)
             turn_start = len(conversation_parts)
 
             # [2] Start Token + Role + Newline
             conversation_parts.append(f"<|im_start|>{turn.role}\n")
 
-            # [3] Add Image Tokens (Pre-pend: 텍스트보다 먼저 위치)
-            # 해당 턴에 이미지가 있다면, 개수만큼 <image> 토큰을 Role 바로 뒤에 붙임
+            # [3] Add Image Tokens (Pre-pend: before text)
+            # If turn has images, add <image> tokens right after Role
             if turn.num_images > 0:
-                # 예: 이미지가 2개면 "<image><image>"
+                # e.g.: if 2 images, "<image><image>"
                 conversation_parts.append("<image>" * turn.num_images)
 
-            # [4] Content (순수 텍스트만)
+            # [4] Content (pure text only)
             text_content = self._extract_text_from_content(turn.content)
             conversation_parts.append(text_content)
 

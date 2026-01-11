@@ -18,16 +18,16 @@ from transformers import (
     AutoModelForCausalLM
 )
 
-# 프로젝트 모듈 경로 설정
+# Set project module path
 project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root))
 
-# UMBRELLA 프로젝트 모듈 임포트
+# UMBRELLA project module imports
 from dataset.umbrella_dataset import UMBRELLADataset
 from dataset.umbrella_collator import UMBRELLACollator
 from model.patch_embed import PatchEmbed
 
-# 로깅 설정
+# Logging setup
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -105,10 +105,10 @@ class UMBRELLAInferenceConfig:
 
 def load_model_with_custom_architecture(cfg: UMBRELLAInferenceConfig, tokenizer: AutoTokenizer):
     """
-    1. Base Model 로드
-    2. [FIX] Tokenizer 길이에 맞춰 Embedding Resize (가중치 로드 전 필수!)
-    3. Custom PatchEmbed로 구조 변경
-    4. Fine-tuned Checkpoint 가중치 로드
+    1. Load Base Model
+    2. [FIX] Resize Embedding to match Tokenizer length (required before loading weights!)
+    3. Replace with Custom PatchEmbed
+    4. Load Fine-tuned Checkpoint weights
     """
     logger.info(f"1. Loading base model architecture: {cfg.base_model_name}")
     try:
@@ -126,11 +126,11 @@ def load_model_with_custom_architecture(cfg: UMBRELLAInferenceConfig, tokenizer:
             trust_remote_code=True
         )
 
-    # [CRITICAL FIX] 가중치를 로드하기 전에 Embedding 크기를 먼저 맞춰야 함
+    # [CRITICAL FIX] Must resize embedding before loading weights
     logger.info(f"2. Resizing token embeddings to {len(tokenizer)}...")
     #model.resize_token_embeddings(len(tokenizer))
 
-    # 3. PatchEmbed 교체
+    # 3. Replace PatchEmbed
     logger.info("3. Replacing PatchEmbed with custom 3D implementation...")
     original_patch_embedding = model.vision_tower.vision_model.embeddings.patch_embedding
     embed_dim = int(original_patch_embedding.out_channels)
@@ -144,7 +144,7 @@ def load_model_with_custom_architecture(cfg: UMBRELLAInferenceConfig, tokenizer:
     )
     setattr(model.vision_tower.vision_model, "embeddings", patch_embed)
 
-    # 4. 학습된 가중치 로드
+    # 4. Load trained weights
     if cfg.model_path and os.path.exists(cfg.model_path):
         logger.info(f"4. Loading fine-tuned weights from: {cfg.model_path}")
         
@@ -160,7 +160,7 @@ def load_model_with_custom_architecture(cfg: UMBRELLAInferenceConfig, tokenizer:
                 else:
                     state_dict = torch.load(state_dict_path, map_location="cpu")
                 
-                # strict=False로 로드 (일부 키 불일치 허용)
+                # Load with strict=False (allow some key mismatches)
                 missing, unexpected = model.load_state_dict(state_dict, strict=False)
                 if missing:
                     print(missing)
@@ -179,7 +179,7 @@ def load_model_with_custom_architecture(cfg: UMBRELLAInferenceConfig, tokenizer:
     return model
 
 def prepare_inputs_for_generation(model, batch, tokenizer, device):
-    """UMBRELLATrainer._generate_step 로직 재구현"""
+    """Reimplement UMBRELLATrainer._generate_step logic"""
     input_ids = batch['input_ids'].to(device)
     attention_mask = batch['attention_mask'].to(device)
     pixel_values = batch.get('pixel_values')
@@ -300,7 +300,7 @@ def main():
         tokenizer.pad_token = tokenizer.eos_token
     
 
-    # 3. Model Load (Tokenizer 전달하여 Resize 수행)
+    # 3. Model Load (Pass Tokenizer for Resize)
     model = load_model_with_custom_architecture(cfg, tokenizer)
 
     # 4. Dataset & Dataloader

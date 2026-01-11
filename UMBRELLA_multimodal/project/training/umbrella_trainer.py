@@ -50,7 +50,7 @@ class UMBRELLATrainingArgs(TrainingArguments):
     
     # 4. [CRITICAL FIX] Evaluation Generation Config (Missing Fields Added Here)
     eval_output_dir: str = field(default="./eval_predictions", metadata={"help": "Directory to save evaluation predictions"})
-    #save_eval_predictions: bool = field(default=True, metadata={"help": "Whether to save eval predictions to JSONL"}) # 필요시 추가    
+    #save_eval_predictions: bool = field(default=True, metadata={"help": "Whether to save eval predictions to JSONL"})  # Add if needed
     eval_max_new_tokens: int = field(default=256, metadata={"help": "Max new tokens for generation"})
     eval_temperature: float = field(default=0.7, metadata={"help": "Temperature for generation"})
     eval_top_p: float = field(default=0.9, metadata={"help": "Top-p for generation"})
@@ -492,17 +492,17 @@ class UMBRELLATrainer(Trainer):
         """
         idx = 0
         
-        # [수정 핵심] 시프트(Shift) 적용
-        # 모델의 logits[t]는 labels[t+1]을 예측한 값입니다.
-        # 따라서 마지막 logits와 첫 번째 label을 제외하고 짝을 맞춰줍니다.
-        
-        # 1. 예측값: 마지막 토큰 제외 (마지막 토큰의 예측은 정답이 없으므로)
+        # [Key Fix] Apply Shift
+        # Model's logits[t] predicts labels[t+1]
+        # Exclude last logits and first label to align pairs
+
+        # 1. Predictions: Exclude last token (no ground truth for last prediction)
         pred_ids = torch.argmax(logits[idx][:-1], dim=-1)
         
-        # 2. 정답값: 첫 번째 토큰 제외 (첫 번째 토큰은 입력이지 예측 대상이 아니므로)
+        # 2. Ground truth: Exclude first token (first token is input, not prediction target)
         gt_ids = labels[idx][1:]
 
-        # 턴 분리 로직 (기존과 동일하되, 시프트된 ID 사용)
+        # Turn separation logic (same as before, using shifted IDs)
         turns = []
         current_gt = []
         current_pd = []
@@ -510,7 +510,7 @@ class UMBRELLATrainer(Trainer):
         ignore_index = -100
 
         for i in range(len(gt_ids)):
-            # 정답이 ignore_index가 아닌 경우만 유효한 예측 구간으로 간주
+            # Only consider valid prediction range when ground truth is not ignore_index
             is_valid = (gt_ids[i] != ignore_index)
 
             if is_valid:
@@ -531,7 +531,7 @@ class UMBRELLATrainer(Trainer):
         if in_turn:
             turns.append((current_gt, current_pd))
 
-        # 출력
+        # Print output
         print(f"\n{'='*20} Prediction Log [Step {self.state.global_step}] (Shifted for visual alignment) {'='*20}")
         if len(turns) == 0:
             print("  (No assistant turns found in this sample)")

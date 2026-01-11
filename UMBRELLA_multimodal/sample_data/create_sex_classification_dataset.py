@@ -24,7 +24,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 # Configuration
-METADATA_PATH = "ABCD_phenotype_total.csv"  # 메타데이터 경로 확인 필요
+METADATA_PATH = "ABCD_phenotype_total.csv"  # Check metadata path
 OUTPUT_DIR = Path("sex_classification_splits_100subjects")
 RANDOM_SEED = 42
 
