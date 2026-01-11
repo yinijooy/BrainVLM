@@ -1,0 +1,100 @@
+# UMBRELLA Training Configuration - T1+FA Multimodal (BrainVLM Style)
+# LLaVA-based Vision-Language Model for Brain MRI Analysis
+# Supports: T1 only, FA only, T1_FA (late fusion)
+
+wandb:
+    API_KEY: "3eb88064bc07c0815d0515d12553a2ed0b1f58cc"
+    project: "multimodal_umbrella"
+
+seed: 1234
+
+# Modality selection: 'T1', 'FA', or 'T1_FA'
+modality: "T1_FA"
+
+dataset:
+    train_size: 0.8
+    val_size: 0.1
+    test_size: 0.1
+    add_context: False
+
+    # T1 structural MRI settings (BrainVLM style)
+    T1:
+        target: ["sex"]
+        img_size: [120, 120, 120]
+        study_sample: ["ABCD"]
+        meta_dir: ["/pscratch/sd/h/heehaw/data/1.ABCD/ABCD_phenotype_total.csv"]
+        img_dir: ["/pscratch/sd/h/heehaw/data/1.ABCD/2.sMRI_freesurfer_256"]
+
+    # FA (Fractional Anisotropy from DTI) settings
+    FA:
+        target: ["sex"]
+        img_size: [120, 120, 120]
+        study_sample: ["ABCD"]
+        meta_dir: ["/pscratch/sd/h/heehaw/data/1.ABCD/ABCD_phenotype_total.csv"]
+        img_dir: ["/pscratch/sd/h/heehaw/data/1.ABCD/FA_images"]  # Update this path
+
+    # Legacy sMRI settings (for backwards compatibility)
+    sMRI:
+        target: ["sex"]
+        img_size: [96, 96, 96]
+        study_sample: ["ABCD"]
+        meta_dir: ["/pscratch/sd/h/heehaw/data/1.ABCD/ABCD_phenotype_total.csv"]
+        img_dir: ["/pscratch/sd/h/heehaw/data/1.ABCD/2.sMRI_freesurfer_256"]
+
+    fMRI:
+        target: ["sex"]
+        img_size: [96, 96, 96, 24]
+        study_sample: []
+        img_dir: []
+        dataset_split_num: 1
+        sequence_length: 24
+        stride_between_seq: 1
+        stride_within_seq: 1
+        shuffle_time_sequence: False
+        input_scaling_method: "znorm_minback"
+        label_scaling_method: "standardization"
+        dtype: "float16"
+        limit_training_samples: Null
+        limit_validation_samples: Null
+        limit_test_samples: Null
+        balanced_training_samples: False
+        balanced_validation_samples: False
+        balanced_test_samples: False
+
+
+model:
+    # LLaVA model
+    hf_name: "llava-hf/llava-interleave-qwen-0.5b-hf"
+
+    # T1 patch embedding (120/20 = 6^3 = 216 patches - reduced for memory)
+    T1:
+        patch_size: [20, 20, 20]
+
+    # FA patch embedding (same as T1 for late fusion compatibility)
+    FA:
+        patch_size: [20, 20, 20]
+
+    # Legacy settings
+    sMRI:
+        patch_size: [16, 16, 16]
+    fMRI:
+        patch_size: [16, 16, 16, 3]
+
+
+trainer:
+    # Data paths
+    train_json_path: "/pscratch/sd/y/yujinyun/UMBRELLA_gemini/data/T1_FA_conversations_full/train_conversations.jsonl"
+    eval_json_path: "/pscratch/sd/y/yujinyun/UMBRELLA_gemini/data/T1_FA_conversations_full/val_conversations.jsonl"
+    output_dir: "/pscratch/sd/y/yujinyun/UMBRELLA_gemini/results/T1_FA_sex_classification"
+
+    max_epochs: 50
+    learning_rate: 0.00005
+    warmup_steps: 100
+    weight_decay: 0.01
+    per_device_batch_size: 4
+    gradient_accumulation_steps: 8
+    gradient_checkpointing: True
+    logging_steps: 20
+    eval_steps: 100
+    ckpt_dir: Null
+    resume_training: False

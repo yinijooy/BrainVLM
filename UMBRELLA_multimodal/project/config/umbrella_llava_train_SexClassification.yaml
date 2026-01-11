@@ -1,0 +1,61 @@
+# UMBRELLA Training Configuration
+# LLaVA-based Vision-Language Model for Brain MRI Analysis
+
+wandb:
+    API_KEY: "3eb88064bc07c0815d0515d12553a2ed0b1f58cc"
+    project: "multimodal_umbrella"
+
+seed: 1234
+
+dataset:
+    train_size: 0.8
+    val_size: 0.1
+    test_size: 0.1
+    add_context: False
+    sMRI:
+        target: ["sex"]
+        img_size: [96, 96, 96]
+        study_sample: ["ABCD"]
+        meta_dir: ["/pscratch/sd/h/heehaw/data/1.ABCD/ABCD_phenotype_total.csv"]
+        img_dir: ["/pscratch/sd/h/heehaw/data/1.ABCD/2.sMRI_freesurfer_256"]
+    fMRI:
+        target: ["sex"]
+        img_size: [96, 96, 96, 24]
+        study_sample: []
+        img_dir: []
+        dataset_split_num: 1
+        sequence_length: 24
+        stride_between_seq: 1
+        stride_within_seq: 1
+        shuffle_time_sequence: False
+        input_scaling_method: "znorm_minback"
+        label_scaling_method: "standardization"
+        dtype: "float16"
+        limit_training_samples: Null
+        limit_validation_samples: Null
+        limit_test_samples: Null
+        balanced_training_samples: False
+        balanced_validation_samples: False
+        balanced_test_samples: False
+
+
+model:
+    # LLaVA model (not BLIP)
+    hf_name: "llava-hf/llava-interleave-qwen-0.5b-hf"
+    sMRI:
+        patch_size: [16, 16, 16]
+    fMRI:
+        patch_size: [16, 16, 16, 3]
+
+
+trainer:
+    max_epochs: 200
+    learning_rate: 0.00005
+    warmup_steps: 100
+    weight_decay: 0.01
+    per_device_batch_size: 4
+    gradient_accumulation_steps: 4
+    gradient_checkpointing: True
+    logging_steps: 20
+    ckpt_dir: Null
+    resume_training: False

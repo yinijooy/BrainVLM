@@ -1,0 +1,104 @@
+
+INFO:__main__:Loading pre-trained model: llava-hf/llava-interleave-qwen-0.5b-hf
+INFO:__main__:Created PatchEmbed with modality_type=T1_FA
+INFO:__main__:T1 patches: 216, FA patches: 216
+INFO:__main__:Creating dataset with modality=T1_FA, img_size=(120, 120, 120)
+INFO:dataset.umbrella_dataset:Loaded 6651 samples from /pscratch/sd/y/yujinyun/UMBRELLA_multimodal/data/conversations_T1_FA/train_conversations.jsonl
+INFO:dataset.umbrella_dataset:Mode: train
+INFO:dataset.umbrella_dataset:Modality type: T1_FA
+INFO:dataset.umbrella_dataset:Max sequence length: 2048
+INFO:dataset.umbrella_dataset:Image size: (120, 120, 120)
+INFO:dataset.umbrella_dataset:4D images: False
+INFO:__main__:Creating dataset with modality=T1_FA, img_size=(120, 120, 120)
+INFO:dataset.umbrella_dataset:Loaded 803 samples from /pscratch/sd/y/yujinyun/UMBRELLA_multimodal/data/conversations_T1_FA/val_conversations.jsonl
+INFO:dataset.umbrella_dataset:Mode: eval
+INFO:dataset.umbrella_dataset:Modality type: T1_FA
+INFO:dataset.umbrella_dataset:Max sequence length: 2048
+INFO:dataset.umbrella_dataset:Image size: (120, 120, 120)
+INFO:dataset.umbrella_dataset:4D images: False
+/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/transformers/training_args.py:1525: FutureWarning: `evaluation_strategy` is deprecated and will be removed in version 4.46 of 🤗 Transformers. Use `eval_strategy` instead
+  warnings.warn(
+INFO:__main__:Starting Training...
+INFO:root:gcc -DNDEBUG -fwrapv -O2 -Wall -fPIC -O2 -isystem /global/homes/y/yujinyun/.conda/envs/BLIP_MRI/include -fPIC -O2 -isystem /global/homes/y/yujinyun/.conda/envs/BLIP_MRI/include -fPIC -c /tmp/tmpkrfjk5fw/test.c -o /tmp/tmpkrfjk5fw/test.o
+INFO:root:gcc /tmp/tmpkrfjk5fw/test.o -laio -o /tmp/tmpkrfjk5fw/a.out
+INFO:root:gcc -DNDEBUG -fwrapv -O2 -Wall -fPIC -O2 -isystem /global/homes/y/yujinyun/.conda/envs/BLIP_MRI/include -fPIC -O2 -isystem /global/homes/y/yujinyun/.conda/envs/BLIP_MRI/include -fPIC -c /tmp/tmp7vv3i7qv/test.c -o /tmp/tmp7vv3i7qv/test.o
+INFO:root:gcc /tmp/tmp7vv3i7qv/test.o -L/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4 -L/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64 -lcufile -o /tmp/tmp7vv3i7qv/a.out
+All special tokens already exist. Skipping add_special_tokens.
+[34m[1mwandb[39m[22m: [33mWARNING[39m The `run_name` is currently set to the same value as `TrainingArguments.output_dir`. If this was not intended, please specify a different run name by setting the `TrainingArguments.run_name` parameter.
+  0%|                 | 0/10350 [00:00<?, ?it/s]
+  0%|                 | 0/10350 [00:00<?, ?it/s]/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/utils/checkpoint.py:464: UserWarning: torch.utils.checkpoint: the use_reentrant parameter should be passed explicitly. In version 2.4 we will raise an exception if use_reentrant is not passed. use_reentrant=False is recommended, but if you need to preserve the current default behavior, you can pass use_reentrant=True. Refer to docs for more details on the differences between the two variants.
+  warnings.warn(
+`use_cache=True` is incompatible with gradient checkpointing. Setting `use_cache=False`...
+==================== Prediction Log [Step 0] (Shifted for visual alignment) ====================
+[Assistant Turn 1]
+  GT: <|im_start|>assistant
+male.<|im_end|>
+  PD: <|im_start|>The TheThe or<|im_end|>
+=================================================================
+==================== Prediction Log [Step 0] (Shifted for visual alignment) ====================
+[Assistant Turn 1]
+  GT: <|im_start|>assistant
+female.<|im_end|>
+  PD: <|im_start|>The TheThe<|im_end|><|im_end|>
+=================================================================
+==================== Prediction Log [Step 0] (Shifted for visual alignment) ====================
+[Assistant Turn 1]
+  GT: <|im_start|>assistant
+male.<|im_end|>
+  PD: <|im_start|>The TheThe or<|im_end|>
+=================================================================
+==================== Prediction Log [Step 0] (Shifted for visual alignment) ====================
+[Assistant Turn 1]
+  GT: <|im_start|>assistant
+female.<|im_end|>
+  PD: <|im_start|>The TheThe<|im_end|><|im_end|>
+=================================================================
+==================== Prediction Log [Step 0] (Shifted for visual alignment) ====================
+[Assistant Turn 1]
+  GT: <|im_start|>assistant
+male.<|im_end|>
+  PD: <|im_start|>The TheThe or<|im_end|>
+=================================================================
+==================== Prediction Log [Step 0] (Shifted for visual alignment) ====================
+[Assistant Turn 1]
+  GT: <|im_start|>assistant
+male.<|im_end|>
+  PD: <|im_start|>The TheThe or<|im_end|>
+=================================================================
+==================== Prediction Log [Step 0] (Shifted for visual alignment) ====================
+[Assistant Turn 1]
+  GT: <|im_start|>assistant
+male.<|im_end|>
+  PD: <|im_start|>The TheThe or<|im_end|>
+=================================================================
+==================== Prediction Log [Step 0] (Shifted for visual alignment) ====================
+[Assistant Turn 1]
+  GT: <|im_start|>assistant
+male.<|im_end|>
+  PD: <|im_start|>The TheThe or<|im_end|>
+=================================================================
+  0%|     | 1/10350 [01:04<185:34:01, 64.55s/it][rank0]: Traceback (most recent call last):
+[rank0]:   File "/pscratch/sd/y/yujinyun/UMBRELLA_multimodal/project/training/main_umbrella_training.py", line 399, in <module>
+[rank0]:     main()
+[rank0]:   File "/pscratch/sd/y/yujinyun/UMBRELLA_multimodal/project/training/main_umbrella_training.py", line 395, in main
+[rank0]:     pipeline.train()
+[rank0]:   File "/pscratch/sd/y/yujinyun/UMBRELLA_multimodal/project/training/main_umbrella_training.py", line 350, in train
+[rank0]:     trainer.train()
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/transformers/trainer.py", line 1948, in train
+[rank0]:     return inner_training_loop(
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/transformers/trainer.py", line 2289, in _inner_training_loop
+[rank0]:     tr_loss_step = self.training_step(model, inputs)
+[rank0]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/transformers/trainer.py", line 3359, in training_step
+[rank0]:     self.accelerator.backward(loss, **kwargs)
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/accelerate/accelerator.py", line 2852, in backward
+[rank0]:     loss.backward(**kwargs)
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/_tensor.py", line 525, in backward
+[rank0]:     torch.autograd.backward(
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/autograd/__init__.py", line 267, in backward
+[rank0]:     _engine_run_backward(
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/autograd/graph.py", line 744, in _engine_run_backward
+[rank0]:     return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]: KeyboardInterrupt

@@ -1,0 +1,86 @@
+
+INFO:__main__:Loading pre-trained model: llava-hf/llava-interleave-qwen-0.5b-hf
+INFO:__main__:Created PatchEmbed with modality_type=T1
+INFO:__main__:T1 patches: 216, FA patches: 216
+All special tokens already exist. Skipping add_special_tokens.
+INFO:__main__:Creating dataset with modality=T1, img_size=(120, 120, 120)
+INFO:dataset.umbrella_dataset:Loaded 9054 samples from /pscratch/sd/y/yujinyun/UMBRELLA_multimodal/data/conversations_T1/train_conversations.jsonl
+INFO:dataset.umbrella_dataset:Mode: train
+INFO:dataset.umbrella_dataset:Modality type: T1
+INFO:dataset.umbrella_dataset:Max sequence length: 2048
+INFO:dataset.umbrella_dataset:Image size: (120, 120, 120)
+INFO:dataset.umbrella_dataset:4D images: False
+INFO:__main__:Creating dataset with modality=T1, img_size=(120, 120, 120)
+INFO:dataset.umbrella_dataset:Loaded 1130 samples from /pscratch/sd/y/yujinyun/UMBRELLA_multimodal/data/conversations_T1/val_conversations.jsonl
+INFO:dataset.umbrella_dataset:Mode: eval
+INFO:dataset.umbrella_dataset:Modality type: T1
+INFO:dataset.umbrella_dataset:Max sequence length: 2048
+INFO:dataset.umbrella_dataset:Image size: (120, 120, 120)
+INFO:dataset.umbrella_dataset:4D images: False
+/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/transformers/training_args.py:1525: FutureWarning: `evaluation_strategy` is deprecated and will be removed in version 4.46 of 🤗 Transformers. Use `eval_strategy` instead
+  warnings.warn(
+[2026-01-11 01:58:46,189] [INFO] [real_accelerator.py:219:get_accelerator] Setting ds_accelerator to cuda (auto detect)
+INFO:__main__:Starting Training...
+INFO:root:gcc -DNDEBUG -fwrapv -O2 -Wall -fPIC -O2 -isystem /global/homes/y/yujinyun/.conda/envs/BLIP_MRI/include -fPIC -O2 -isystem /global/homes/y/yujinyun/.conda/envs/BLIP_MRI/include -fPIC -c /tmp/tmpy8njsgmm/test.c -o /tmp/tmpy8njsgmm/test.o
+INFO:root:gcc /tmp/tmpy8njsgmm/test.o -laio -o /tmp/tmpy8njsgmm/a.out
+INFO:root:gcc -DNDEBUG -fwrapv -O2 -Wall -fPIC -O2 -isystem /global/homes/y/yujinyun/.conda/envs/BLIP_MRI/include -fPIC -O2 -isystem /global/homes/y/yujinyun/.conda/envs/BLIP_MRI/include -fPIC -c /tmp/tmpok9tygjx/test.c -o /tmp/tmpok9tygjx/test.o
+INFO:root:gcc /tmp/tmpok9tygjx/test.o -L/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4 -L/opt/nvidia/hpc_sdk/Linux_x86_64/24.5/cuda/12.4/lib64 -lcufile -o /tmp/tmpok9tygjx/a.out
+[34m[1mwandb[39m[22m: [33mWARNING[39m The `run_name` is currently set to the same value as `TrainingArguments.output_dir`. If this was not intended, please specify a different run name by setting the `TrainingArguments.run_name` parameter.
+  0%|                                                                                                 | 0/14150 [00:00<?, ?it/s][rank0]: Traceback (most recent call last):
+[rank0]:   File "/pscratch/sd/y/yujinyun/UMBRELLA_multimodal/project/training/main_umbrella_training.py", line 399, in <module>
+[rank0]:     main()
+[rank0]:   File "/pscratch/sd/y/yujinyun/UMBRELLA_multimodal/project/training/main_umbrella_training.py", line 395, in main
+[rank0]:     pipeline.train()
+[rank0]:   File "/pscratch/sd/y/yujinyun/UMBRELLA_multimodal/project/training/main_umbrella_training.py", line 350, in train
+[rank0]:     trainer.train()
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/transformers/trainer.py", line 1948, in train
+[rank0]:     return inner_training_loop(
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/transformers/trainer.py", line 2246, in _inner_training_loop
+[rank0]:     for step, inputs in enumerate(epoch_iterator):
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/accelerate/data_loader.py", line 567, in __iter__
+[rank0]:     current_batch = next(dataloader_iter)
+[rank0]:                     ^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 631, in __next__
+[rank0]:     data = self._next_data()
+[rank0]:            ^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/utils/data/dataloader.py", line 675, in _next_data
+[rank0]:     data = self._dataset_fetcher.fetch(index)  # may raise StopIteration
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/utils/data/_utils/fetch.py", line 51, in fetch
+[rank0]:     data = [self.dataset[idx] for idx in possibly_batched_index]
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/utils/data/_utils/fetch.py", line 51, in <listcomp>
+[rank0]:     data = [self.dataset[idx] for idx in possibly_batched_index]
+[rank0]:             ~~~~~~~~~~~~^^^^^
+[rank0]:   File "/pscratch/sd/y/yujinyun/UMBRELLA_multimodal/project/dataset/umbrella_dataset.py", line 236, in __getitem__
+[rank0]:     pixel_values = self._load_brain_scans(sample.brain_scans)
+[rank0]:                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/pscratch/sd/y/yujinyun/UMBRELLA_multimodal/project/dataset/umbrella_dataset.py", line 303, in _load_brain_scans
+[rank0]:     data = self.image_transform(data)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/monai/transforms/compose.py", line 322, in __call__
+[rank0]:     result = execute_compose(
+[rank0]:              ^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/monai/transforms/compose.py", line 111, in execute_compose
+[rank0]:     data = apply_transform(
+[rank0]:            ^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/monai/transforms/transform.py", line 141, in apply_transform
+[rank0]:     return _apply_transform(transform, data, unpack_items, lazy, overrides, log_stats)
+[rank0]:            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/monai/transforms/transform.py", line 98, in _apply_transform
+[rank0]:     return transform(data, lazy=lazy) if isinstance(transform, LazyTrait) else transform(data)
+[rank0]:                                                                                ^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/monai/transforms/intensity/array.py", line 706, in __call__
+[rank0]:     img = self._normalize(img, self.subtrahend, self.divisor)
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/monai/transforms/intensity/array.py", line 675, in _normalize
+[rank0]:     _div = div if div is not None else self._std(img[slices])
+[rank0]:                                                  ~~~^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/monai/data/meta_tensor.py", line 276, in __torch_function__
+[rank0]:     ret = super().__torch_function__(func, types, args, kwargs)
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+[rank0]:   File "/global/homes/y/yujinyun/.conda/envs/BLIP_MRI/lib/python3.11/site-packages/torch/_tensor.py", line 1443, in __torch_function__
+[rank0]:     ret = func(*args, **kwargs)
+[rank0]:           ^^^^^^^^^^^^^^^^^^^^^
+[rank0]: KeyboardInterrupt
